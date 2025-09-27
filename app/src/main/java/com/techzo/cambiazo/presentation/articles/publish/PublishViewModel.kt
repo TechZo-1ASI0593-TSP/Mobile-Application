@@ -25,7 +25,6 @@ import com.techzo.cambiazo.domain.ProductCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import com.techzo.cambiazo.data.remote.ai.AiSuggestionDto
-import com.techzo.cambiazo.data.repository.GeminiAiRepository
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -36,10 +35,7 @@ class PublishViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val productRepository: ProductRepository
 ):ViewModel() {
-    private val aiRepo = GeminiAiRepository(
-        apiKey = Constants.GEMINI_API_KEY,
-        modelName = "gemini-1.5-flash-8b-latest"
-    )
+
     private val productToEdit = mutableStateOf<Product?>(null)
      val limitReached = mutableStateOf(false)
 
@@ -167,34 +163,7 @@ class PublishViewModel @Inject constructor(
         return sb.toString().trim()
     }
 
-    fun analyzeImageWithAI(context: Context, forceOverride: Boolean? = null) {
-        val uri = _image.value ?: run { _errorImage.value = true; return }
-        _aiLoading.value = true
-        _messageError.value = null; _descriptionError.value = null
 
-        val shouldOverride = forceOverride ?: _forceAiOverwrite.value
-
-        viewModelScope.launch {
-            when (val res = aiRepo.analyzeImage(context, uri)) {
-                is Resource.Success -> {
-                    _aiSuggestion.value = res.data
-                    applyAiSuggestion(res.data, overrideExisting = shouldOverride)
-
-                    _aiImprovementTips.value = res.data?.improvementTips ?: emptyList()
-                    _aiPhotoTips.value = res.data?.photoTips ?: emptyList()
-                    _showAiTips.value = (_aiImprovementTips.value + _aiPhotoTips.value).isNotEmpty()
-
-                    _aiLoading.value = false
-                    _forceAiOverwrite.value = false
-                }
-                is Resource.Error -> {
-                    _aiLoading.value = false
-                    _messageError.value = "No pude analizar la imagen"
-                    _descriptionError.value = res.message ?: "Intenta nuevamente"
-                }
-            }
-        }
-    }
 
     private fun applyAiSuggestion(s: AiSuggestionDto?, overrideExisting: Boolean = false) {
         if (s == null) return
