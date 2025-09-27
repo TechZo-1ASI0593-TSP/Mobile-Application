@@ -148,20 +148,6 @@ fun PublishScreen(
         }
     }
 
-    LaunchedEffect(image) {
-        if (image != null && viewModel.aiSuggestion.value == null && !viewModel.aiLoading.value) {
-            viewModel.analyzeImageWithAI(context)
-        }
-    }
-
-    if (viewModel.showAiTips.value) {
-        DialogApp(
-            "Sugerencias de IA",
-            viewModel.formattedAiTips(),
-            "Entendido",
-            onClickButton1 = { viewModel.hideAiTips() }
-        )
-    }
     MainScaffoldApp(
         paddingCard = PaddingValues(start = 30.dp, end = 30.dp, top = 25.dp),
         contentsHeader = {
@@ -265,12 +251,7 @@ fun PublishScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ButtonApp(
-                        text = if (viewModel.aiLoading.value) "Analizando..." else "Rellenar con IA",
-                        enable = !viewModel.aiLoading.value && image != null
-                    ) {
-                        viewModel.analyzeImageWithAI(context, forceOverride = true)
-                    }
+
                     if (viewModel.aiLoading.value) {
                         Spacer(Modifier.size(12.dp))
                         CircularProgressIndicator(color = Color(0xFFFFD146))
