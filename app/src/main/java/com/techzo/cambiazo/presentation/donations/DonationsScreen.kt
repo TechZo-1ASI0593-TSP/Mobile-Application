@@ -39,8 +39,7 @@ import com.techzo.cambiazo.data.remote.donations.OngDto
 @Composable
 fun DonationScreen(
     back: () -> Unit = {},
-    onOngClick: (OngDto) -> Unit = {},
-    openDonations: ()-> Unit = {}
+    onOngClick: (String) -> Unit = {},
 ) {
     val viewModel: DonationsViewModel = hiltViewModel()
     val state = viewModel.ongs.value
@@ -95,7 +94,7 @@ fun DonationScreen(
                     }
                     else -> {
                         items(filteredOngs) { ong ->
-                            OngCard(ong = ong, onClick = { onOngClick(ong) })
+                            OngCard(ong = ong, onClick = { onOngClick(ong.id.toString()) })
                             Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
