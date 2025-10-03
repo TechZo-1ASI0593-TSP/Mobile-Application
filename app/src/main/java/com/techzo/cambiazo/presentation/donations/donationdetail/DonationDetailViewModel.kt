@@ -7,10 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.techzo.cambiazo.common.Resource
 import com.techzo.cambiazo.common.UIState
-import com.techzo.cambiazo.data.remote.donations.Ong
-import com.techzo.cambiazo.data.remote.donations.OngDto
 import com.techzo.cambiazo.data.repository.DonationsRepository
-import com.techzo.cambiazo.domain.Product
+import com.techzo.cambiazo.domain.OngDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -23,8 +21,8 @@ class DonationDetailViewModel @Inject constructor(
     ) : ViewModel() {
 
 
-    private val _ong = mutableStateOf(UIState<Ong>())
-    val ong: State<UIState<Ong>> = _ong
+    private val _ong = mutableStateOf(UIState<OngDetail>())
+    val ong: State<UIState<OngDetail>> = _ong
 
     init {
         val ongIdString: String? = savedStateHandle["ongId"]

@@ -472,7 +472,7 @@ fun NavScreen(
 
         composable(route = Routes.DonationDetail.route){
             DonationDetailScreen(
-                back = {}
+                back = {navController.popBackStack()}
             )
         }
 
