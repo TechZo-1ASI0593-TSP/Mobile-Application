@@ -45,6 +45,7 @@ import com.techzo.cambiazo.presentation.profile.myreviews.MyReviewsScreen
 import com.techzo.cambiazo.presentation.auth.register.SignUpScreen
 import com.techzo.cambiazo.presentation.auth.register.TyC.TermsAndConditionsScreen
 import com.techzo.cambiazo.presentation.donations.DonationScreen
+import com.techzo.cambiazo.presentation.donations.donationdetail.DonationDetailScreen
 import com.techzo.cambiazo.presentation.explorer.review.ReviewScreen
 import com.techzo.cambiazo.presentation.profile.settings.SettingsScreen
 import com.techzo.cambiazo.presentation.profile.subscription.MySubscriptionScreen
@@ -137,6 +138,11 @@ sealed class Routes(val route: String) {
     object MySubscription : Routes("MySubscriptionScreen")
     object Plans : Routes("PlansScreen")
     object ChangePassword : Routes("ChangePasswordScreen")
+ 
+    object DonationDetail : Routes("DonationDetailScreen/{ongId}") {
+        fun createDonationDetailsRoute(ongId: String) = "DonationDetailScreen/$ongId"
+    }
+
     object OtpCodeVerification : Routes("OtpCodeVerificationScreen/{email}/{codeGenerated}") {
         fun createRoute(email: String, codeGenerated: String): String {
             val encodedEmail = Uri.encode(email)
@@ -150,6 +156,7 @@ sealed class Routes(val route: String) {
             return "NewPasswordScreen/$encodedEmail"
         }
     }
+
 }
 
 @Composable
@@ -266,9 +273,13 @@ fun NavScreen(
         composable(route = Routes.Donations.route) {
             DonationScreen(
                 back = { navController.popBackStack() },
-                onOngClick = { /* lo que desees hacer al tocar una ONG */ },
-                openDonations = { navController.navigate(Routes.Donations.route) }
-                )
+                onOngClick = {ongId->
+                    navController.navigate(
+                        Routes.DonationDetail.createDonationDetailsRoute(
+                            ongId
+                        )
+                    )},
+            )
         }
 
 
@@ -458,6 +469,15 @@ fun NavScreen(
                     popUpTo(0) { inclusive = true }
                 } })
         }
+
+        composable(route = Routes.DonationDetail.route){
+            DonationDetailScreen(
+                back = {navController.popBackStack()}
+            )
+        }
+
+
+
     }
 }
 
