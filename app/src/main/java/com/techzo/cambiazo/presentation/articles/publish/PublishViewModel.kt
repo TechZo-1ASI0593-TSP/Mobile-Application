@@ -26,6 +26,7 @@ import com.techzo.cambiazo.domain.ProductCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import com.techzo.cambiazo.data.remote.ai.AiSuggestionDto
+import com.techzo.cambiazo.data.repository.AiRepository
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -34,7 +35,8 @@ import javax.inject.Inject
 class PublishViewModel @Inject constructor(
     private val productCategoryRepository: ProductCategoryRepository,
     private val locationRepository: LocationRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val aiRepository: AiRepository
 ):ViewModel() {
 
     private val aiRepo = GeminiAiRepository(
