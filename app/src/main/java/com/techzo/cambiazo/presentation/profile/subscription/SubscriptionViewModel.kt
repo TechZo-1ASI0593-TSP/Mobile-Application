@@ -154,17 +154,28 @@ class SubscriptionViewModel @Inject constructor(
             val payPalWebCheckoutClient = PayPalWebCheckoutClient(activity, config, returnUrl)
             payPalWebCheckoutClient.listener = object : PayPalWebCheckoutListener {
                 override fun onPayPalWebSuccess(result: PayPalWebCheckoutResult) {
-                    _state.value = UIState(message = "Pago realizado con éxito", data = result)
+                    _state.value = UIState(
+                        message = "Pago realizado con éxito",
+                        data = result,
+                        status = "success"
+                    )
                 }
 
                 override fun onPayPalWebFailure(error: PayPalSDKError) {
-                    _state.value = UIState(message = "Error en el pago", data = error)
+                    _state.value = UIState(
+                        message = "Error en el pago",
+                        data = error,
+                        status = "error"
+                    )
                 }
 
                 override fun onPayPalWebCanceled() {
-                    _state.value = UIState(message = "Pago cancelado por el usuario")
+                    _state.value = UIState(
+                        message = "Pago cancelado por el usuario",
+                        status = "cancelled"
+                    )
                 }
-
+            }
             }
 
             orderid = orderID
