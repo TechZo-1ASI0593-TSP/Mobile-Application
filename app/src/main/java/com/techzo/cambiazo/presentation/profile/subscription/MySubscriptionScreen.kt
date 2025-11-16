@@ -38,51 +38,70 @@ import com.techzo.cambiazo.domain.Subscription
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-
+/**
+ * Pantalla que muestra la suscripción actual del usuario.
+ */
 @Composable
 fun MySubscriptionScreen(
     back: () -> Unit = {},
     openPlans: () -> Unit = {}
 ) {
-
     MainScaffoldApp(
         paddingCard = PaddingValues(top = 20.dp),
         contentsHeader = {
             Column(
-                Modifier
+                modifier = Modifier
                     .padding(bottom = 30.dp)
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ButtonIconHeaderApp(Icons.Filled.ArrowBack, onClick = { back() })
+                ButtonIconHeaderApp(
+                    Icons.Filled.ArrowBack,
+                    onClick = { back() }
+                )
                 TextTitleHeaderApp("Suscripción")
             }
         },
         content = {
-            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)) {
+            Column(
+                modifier = Modifier.padding(
+                    horizontal = 20.dp,
+                    vertical = 5.dp
+                )
+            ) {
                 SubTitleText("Suscripción actual")
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // Si existe una suscripción, se muestra la tarjeta del plan; si no, un mensaje simple.
                 Constants.userSubscription?.let { subscription ->
-                    SubscriptionPlanCard(subscription = subscription, openPlans = openPlans)
+                    SubscriptionPlanCard(
+                        subscription = subscription,
+                        openPlans = openPlans
+                    )
                 } ?: run {
-                    Text(text = "No subscription available", color = Color.Red)
+                    Text(
+                        text = "No subscription available",
+                        color = Color.Red
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
     )
-
 }
 
-
+/**
+ * Tarjeta que detalla el plan de suscripción del usuario.
+ */
 @Composable
 fun SubscriptionPlanCard(
     subscription: Subscription,
     openPlans: () -> Unit = {}
 ) {
     val plan = subscription.plan
+
+    // Color de fondo según el tipo de plan
     val backgroundColor = when (plan.id) {
         1 -> Color.Gray
         2 -> Color.Black
@@ -90,6 +109,7 @@ fun SubscriptionPlanCard(
     }
     val iconColor = if (plan.id == 3) Color.Black else Color.White
 
+    // Formato de fechas para mostrar la fecha fin/renovación
     val inputDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
     val outputDateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
     val parsedDate = inputDateFormat.parse(subscription.endDate)
@@ -103,13 +123,24 @@ fun SubscriptionPlanCard(
         Column(
             modifier = Modifier
                 .background(Color.White)
-                .padding(end = 20.dp, start = 20.dp, top = 20.dp, bottom = 10.dp)
+                .padding(
+                    start = 20.dp,
+                    end = 20.dp,
+                    top = 20.dp,
+                    bottom = 10.dp
+                )
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 5.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 5.dp)
+            ) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .background(backgroundColor, shape = RoundedCornerShape(5.dp)),
+                        .background(
+                            backgroundColor,
+                            shape = RoundedCornerShape(5.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -146,22 +177,42 @@ fun SubscriptionPlanCard(
 
                     Spacer(modifier = Modifier.width(3.dp))
 
-                    Text(text = "Tu suscripción se renovará el ", fontSize = 12.5.sp)
-                    Text(text = formattedEndDate, fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
-                    Text(text = " por ", fontSize = 12.5.sp)
-                    Text(text = "$${plan.price}", fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "Tu suscripción se renovará el ",
+                        fontSize = 12.5.sp
+                    )
+                    Text(
+                        text = formattedEndDate,
+                        fontSize = 12.5.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = " por ",
+                        fontSize = 12.5.sp
+                    )
+                    Text(
+                        text = "$${plan.price}",
+                        fontSize = 12.5.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
-            HorizontalDivider(color = Color(0xFFF2F2F2), thickness = 1.5.dp)
+            HorizontalDivider(
+                color = Color(0xFFF2F2F2),
+                thickness = 1.5.dp
+            )
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            subscription.plan.benefits.forEach { benefits ->
+            // Lista de beneficios del plan
+            subscription.plan.benefits.forEach { benefit ->
                 Text(
-                    modifier = Modifier.padding(start = 2.dp, bottom = 2.dp).padding(horizontal = 5.dp),
-                    text = "• ${benefits.description}",
+                    modifier = Modifier
+                        .padding(start = 2.dp, bottom = 2.dp)
+                        .padding(horizontal = 5.dp),
+                    text = "• ${benefit.description}",
                     fontSize = 14.sp,
                     color = Color.Black
                 )

@@ -67,12 +67,18 @@ fun PaymentScreen(
 
     var showDialog by remember { mutableStateOf(false) }
 
-    val rotationAngle by animateFloatAsState(if (showBack) 180f else 0f, label = "")
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (showBack) 180f else 0f,
+        label = ""
+    )
 
     fun determineCardType(number: String): String {
         return when {
             number.startsWith("4") -> "Visa"
-            number.startsWith("51") || number.startsWith("52") || number.startsWith("53") || number.startsWith("54") || number.startsWith("55") || (number.take(4).toIntOrNull() in 2221..2720) -> "MasterCard"
+            number.startsWith("51") || number.startsWith("52") || number.startsWith("53") ||
+                    number.startsWith("54") || number.startsWith("55") ||
+                    (number.take(4).toIntOrNull() in 2221..2720) -> "MasterCard"
+
             number.startsWith("34") || number.startsWith("37") -> "American Express"
             number.startsWith("36") || number.startsWith("38") || number.startsWith("39") -> "Diners Club International"
             else -> "Unknown"
@@ -80,16 +86,29 @@ fun PaymentScreen(
     }
 
     val isCardTypeValid = cardType != "Unknown"
-    val isExpiryDateValid = expiryDate.length == 5 && expiryDate.substring(0, 2)
-        .toIntOrNull() in 1..12 && (expiryDate.substring(3, 5).toIntOrNull() ?: 0) > 24
+    val isExpiryDateValid =
+        expiryDate.length == 5 &&
+                (expiryDate.substring(0, 2).toIntOrNull() in 1..12) &&
+                ((expiryDate.substring(3, 5).toIntOrNull() ?: 0) > 24)
+
     val isCvvValid = cvv.length == 3
+
     val isCardNumberValid = when (cardType) {
-        "Visa", "MasterCard", "Diners Club International" -> cardNumber.replace(" ", "").length == 16
-        "American Express" -> cardNumber.replace(" ", "").length == 15
+        "Visa", "MasterCard", "Diners Club International" ->
+            cardNumber.replace(" ", "").length == 16
+
+        "American Express" ->
+            cardNumber.replace(" ", "").length == 15
+
         else -> false
     }
-    val isFormValid = cardHolderName.isNotEmpty() && isCardNumberValid && isExpiryDateValid && isCvvValid && isCardTypeValid
 
+    val isFormValid =
+        cardHolderName.isNotEmpty() &&
+                isCardNumberValid &&
+                isExpiryDateValid &&
+                isCvvValid &&
+                isCardTypeValid
 
     LaunchedEffect(cardNumber) {
         cardType = determineCardType(cardNumber)
@@ -104,7 +123,12 @@ fun PaymentScreen(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ButtonIconHeaderApp(Icons.Filled.ArrowBack, onClick = { if (paymentCardScreen) paymentCardScreen = false else back() })
+                ButtonIconHeaderApp(
+                    Icons.Filled.ArrowBack,
+                    onClick = {
+                        if (paymentCardScreen) paymentCardScreen = false else back()
+                    }
+                )
                 TextTitleHeaderApp("Pago")
             }
         },
@@ -112,7 +136,8 @@ fun PaymentScreen(
             Column(modifier = Modifier.padding(horizontal = 30.dp)) {
 
                 if (plan != null) {
-                    if (!paymentCardScreen){
+
+                    if (!paymentCardScreen) {
 
                         val iconColor = if (plan.id == 3) Color.Black else Color.White
                         val backgroundColor = when (plan.id) {
@@ -135,7 +160,10 @@ fun PaymentScreen(
                             Box(
                                 modifier = Modifier
                                     .size(65.dp)
-                                    .background(backgroundColor, shape = RoundedCornerShape(10.dp)),
+                                    .background(
+                                        backgroundColor,
+                                        shape = RoundedCornerShape(10.dp)
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -193,7 +221,10 @@ fun PaymentScreen(
                                     Box(
                                         modifier = Modifier
                                             .size(55.dp)
-                                            .background(Color(0xFF353535), shape = CircleShape),
+                                            .background(
+                                                Color(0xFF353535),
+                                                shape = CircleShape
+                                            ),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
@@ -220,25 +251,35 @@ fun PaymentScreen(
                                         tint = Color.Black,
                                         modifier = Modifier.size(28.dp)
                                     )
-
                                 }
 
-                                HorizontalDivider(color = Color(0xFFF2F2F2), thickness = 1.5.dp)
+                                HorizontalDivider(
+                                    color = Color(0xFFF2F2F2),
+                                    thickness = 1.5.dp
+                                )
 
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 0.dp, vertical = 10.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(15.dp, Alignment.End)
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        15.dp,
+                                        Alignment.End
+                                    )
                                 ) {
-                                    val cardTypes = listOf("Visa", "MasterCard", "American Express", "Diners Club International")
+                                    val cardTypes = listOf(
+                                        "Visa",
+                                        "MasterCard",
+                                        "American Express",
+                                        "Diners Club International"
+                                    )
                                     val cardTypeIcons = mapOf(
                                         "Visa" to R.drawable.visa,
                                         "MasterCard" to R.drawable.mastercad,
                                         "American Express" to R.drawable.american_express,
                                         "Diners Club International" to R.drawable.diners_club
                                     )
-                                    val backgroundColors = mapOf(
+                                    val cardBackgroundColors = mapOf(
                                         "Visa" to Color(0xFF25359E),
                                         "MasterCard" to Color.White,
                                         "American Express" to Color(0xFF1B7DD4),
@@ -247,7 +288,8 @@ fun PaymentScreen(
 
                                     cardTypes.forEach { type ->
                                         val icon = cardTypeIcons[type]
-                                        val backgroundColors = backgroundColors[type] ?: Color.Transparent
+                                        val bgColor =
+                                            cardBackgroundColors[type] ?: Color.Transparent
 
                                         Box(
                                             modifier = Modifier
@@ -259,7 +301,7 @@ fun PaymentScreen(
                                                     RoundedCornerShape(5.dp)
                                                 )
                                                 .background(
-                                                    backgroundColors,
+                                                    bgColor,
                                                     shape = RoundedCornerShape(5.dp)
                                                 ),
                                             contentAlignment = Alignment.Center
@@ -277,10 +319,9 @@ fun PaymentScreen(
                                     }
                                 }
                             }
-
                         }
-
                     } else {
+                        // Tarjeta animada (frontal / reverso)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -302,9 +343,8 @@ fun PaymentScreen(
 
                                             "MasterCard" -> Brush.verticalGradient(
                                                 listOf(
-                                                    Color(
-                                                        0xFF161616
-                                                    ), Color(0xFF343434)
+                                                    Color(0xFF161616),
+                                                    Color(0xFF343434)
                                                 )
                                             )
 
@@ -316,7 +356,10 @@ fun PaymentScreen(
                                             )
 
                                             "Diners Club International" -> Brush.verticalGradient(
-                                                listOf(Color(0xFF1D5892), Color(0xFF2F7DC7))
+                                                listOf(
+                                                    Color(0xFF1D5892),
+                                                    Color(0xFF2F7DC7)
+                                                )
                                             )
 
                                             else -> Brush.verticalGradient(
@@ -405,7 +448,9 @@ fun PaymentScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = cardHolderName.toUpperCase(Locale.ROOT).ifEmpty { "NOMBRE Y APELLIDO" },
+                                            text = cardHolderName
+                                                .toUpperCase(Locale.ROOT)
+                                                .ifEmpty { "NOMBRE Y APELLIDO" },
                                             color = if (cardHolderName.isEmpty()) Color(0xFFA8A8A8) else Color.White,
                                             fontSize = 14.sp
                                         )
@@ -422,13 +467,16 @@ fun PaymentScreen(
                                         Modifier
                                             .fillMaxWidth()
                                             .background(Color.Black)
-                                            .height(50.dp))
+                                            .height(50.dp)
+                                    )
 
                                     Spacer(modifier = Modifier.height(30.dp))
 
-                                    Box(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 30.dp)) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 30.dp)
+                                    ) {
                                         Text(
                                             text = cvv.ifEmpty { "XXX" },
                                             color = if (cvv.isEmpty()) Color.Gray else Color.Black,
@@ -444,14 +492,15 @@ fun PaymentScreen(
                                                 }
                                         )
                                     }
-                                    Spacer(modifier = Modifier.height(30.dp))
 
+                                    Spacer(modifier = Modifier.height(30.dp))
                                 }
                             }
                         }
 
                         Spacer(modifier = Modifier.height(20.dp))
 
+                        // Nombre y apellido
                         PaymentText(subTittle = "Nombre y Apellido")
                         BasicTextField(
                             value = cardHolderName.toUpperCase(Locale.ROOT),
@@ -460,14 +509,20 @@ fun PaymentScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp)
-                                .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(8.dp)),
+                                .background(
+                                    Color(0xFFF0F0F0),
+                                    shape = RoundedCornerShape(8.dp)
+                                ),
                             decorationBox = { innerTextField ->
-                                Box( modifier = Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 10.dp, vertical = 10.dp),
                                     contentAlignment = Alignment.CenterStart
                                 ) {
-                                    if (cardHolderName.isEmpty()) { Text("Nombre y Apellido", color = Color.Gray) }
+                                    if (cardHolderName.isEmpty()) {
+                                        Text("Nombre y Apellido", color = Color.Gray)
+                                    }
                                     innerTextField()
                                 }
                             }
@@ -475,6 +530,7 @@ fun PaymentScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        // Número de tarjeta
                         PaymentText(subTittle = "Número de la tarjeta")
                         BasicTextField(
                             value = TextFieldValue(cardNumber, TextRange(cardNumber.length)),
@@ -486,18 +542,43 @@ fun PaymentScreen(
                                     "Visa", "MasterCard", "Unknown" -> {
                                         formattedText = digits.chunked(4).joinToString(" ")
                                     }
+
                                     "American Express" -> {
                                         formattedText = when {
-                                            digits.length > 10 -> digits.take(4) + " " + digits.drop(4).take(6) + " " + digits.drop(10)
-                                            digits.length > 4 -> digits.take(4) + " " + digits.drop(4).take(6)
+                                            digits.length > 10 -> digits.take(4) +
+                                                    " " +
+                                                    digits.drop(4).take(6) +
+                                                    " " +
+                                                    digits.drop(10)
+
+                                            digits.length > 4 -> digits.take(4) +
+                                                    " " +
+                                                    digits.drop(4).take(6)
+
                                             else -> digits
                                         }
                                     }
+
                                     "Diners Club International" -> {
                                         formattedText = when {
-                                            digits.length > 12 -> digits.take(4) + " " + digits.drop(4).take(4) + " " + digits.drop(8).take(4) + " " + digits.drop(12).take(2)
-                                            digits.length > 8 -> digits.take(4) + " " + digits.drop(4).take(4) + " " + digits.drop(8).take(4)
-                                            digits.length > 4 -> digits.take(4) + " " + digits.drop(4).take(4)
+                                            digits.length > 12 -> digits.take(4) +
+                                                    " " +
+                                                    digits.drop(4).take(4) +
+                                                    " " +
+                                                    digits.drop(8).take(4) +
+                                                    " " +
+                                                    digits.drop(12).take(2)
+
+                                            digits.length > 8 -> digits.take(4) +
+                                                    " " +
+                                                    digits.drop(4).take(4) +
+                                                    " " +
+                                                    digits.drop(8).take(4)
+
+                                            digits.length > 4 -> digits.take(4) +
+                                                    " " +
+                                                    digits.drop(4).take(4)
+
                                             else -> digits
                                         }
                                     }
@@ -510,10 +591,14 @@ fun PaymentScreen(
                                     else -> 19
                                 }
 
-                                if (formattedText.length > maxLength) { formattedText = formattedText.take(maxLength) }
+                                if (formattedText.length > maxLength) {
+                                    formattedText = formattedText.take(maxLength)
+                                }
 
-                                cardNumber = TextFieldValue(text = formattedText, selection = newText.selection).text
-
+                                cardNumber = TextFieldValue(
+                                    text = formattedText,
+                                    selection = newText.selection
+                                ).text
                             },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
@@ -521,14 +606,20 @@ fun PaymentScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp)
-                                .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(8.dp)),
+                                .background(
+                                    Color(0xFFF0F0F0),
+                                    shape = RoundedCornerShape(8.dp)
+                                ),
                             decorationBox = { innerTextField ->
-                                Box( modifier = Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 10.dp, vertical = 10.dp),
                                     contentAlignment = Alignment.CenterStart
                                 ) {
-                                    if (cardNumber.isEmpty()) { Text("XXXX XXXX XXXX XXXX", color = Color.Gray) }
+                                    if (cardNumber.isEmpty()) {
+                                        Text("XXXX XXXX XXXX XXXX", color = Color.Gray)
+                                    }
                                     innerTextField()
                                 }
                             }
@@ -544,32 +635,53 @@ fun PaymentScreen(
                             Column(Modifier.weight(1f)) {
                                 PaymentText(subTittle = "Fecha de expiración")
                                 BasicTextField(
-                                    value = TextFieldValue(expiryDate, TextRange(expiryDate.length)),
+                                    value = TextFieldValue(
+                                        expiryDate,
+                                        TextRange(expiryDate.length)
+                                    ),
                                     onValueChange = { newText ->
                                         val digits = newText.text.filter { it.isDigit() }
                                         var formattedText = digits
 
-                                        if (digits.length >= 3) { formattedText = digits.take(2) + "/" + digits.drop(2) }
+                                        if (digits.length >= 3) {
+                                            formattedText =
+                                                digits.take(2) + "/" + digits.drop(2)
+                                        }
 
-                                        if (formattedText.length > 5) { formattedText = formattedText.take(5) }
+                                        if (formattedText.length > 5) {
+                                            formattedText = formattedText.take(5)
+                                        }
 
-                                        val newCursorPosition = if (formattedText.length == 3) 4 else formattedText.length
+                                        val newCursorPosition =
+                                            if (formattedText.length == 3) 4
+                                            else formattedText.length
 
-                                        expiryDate = TextFieldValue(text = formattedText, selection = TextRange(newCursorPosition)).text
+                                        expiryDate = TextFieldValue(
+                                            text = formattedText,
+                                            selection = TextRange(newCursorPosition)
+                                        ).text
                                     },
                                     decorationBox = { innerTextField ->
-                                        Box( modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 10.dp, vertical = 10.dp),
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 10.dp, vertical = 10.dp),
                                             contentAlignment = Alignment.CenterStart
                                         ) {
-                                            if (expiryDate.isEmpty()) { Text("MM/YY", color = Color.Gray) }
-
+                                            if (expiryDate.isEmpty()) {
+                                                Text("MM/YY", color = Color.Gray)
+                                            }
                                             innerTextField()
                                         }
                                     },
-                                    textStyle = TextStyle(color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Normal),
-                                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                                    textStyle = TextStyle(
+                                        color = Color.Black,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Normal
+                                    ),
+                                    keyboardOptions = KeyboardOptions.Default.copy(
+                                        keyboardType = KeyboardType.Number
+                                    ),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(50.dp)
@@ -586,10 +698,17 @@ fun PaymentScreen(
                                 BasicTextField(
                                     value = cvv,
                                     onValueChange = {
-                                        if (it.length <= 3 && it.all { char -> char.isDigit() }) { cvv = it }
+                                        if (it.length <= 3 && it.all { ch -> ch.isDigit() }) {
+                                            cvv = it
+                                        }
                                     },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number
+                                    ),
+                                    textStyle = TextStyle(
+                                        color = Color.Black,
+                                        fontSize = 16.sp
+                                    ),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(50.dp)
@@ -599,31 +718,42 @@ fun PaymentScreen(
                                         )
                                         .onFocusChanged { showBack = it.hasFocus },
                                     decorationBox = { innerTextField ->
-                                        Box( modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 10.dp, vertical = 10.dp),
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 10.dp, vertical = 10.dp),
                                             contentAlignment = Alignment.CenterStart
                                         ) {
-                                            if (cvv.isEmpty()) { Text("CVV", color = Color.Gray, fontSize = 16.sp) }
+                                            if (cvv.isEmpty()) {
+                                                Text(
+                                                    "CVV",
+                                                    color = Color.Gray,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
                                             innerTextField()
                                         }
                                     }
                                 )
                             }
                         }
+
                         Spacer(modifier = Modifier.height(30.dp))
+
                         ButtonApp(
                             text = "Pagar",
                             enable = isFormValid,
                             onClick = {
                                 showDialog = true
                                 subscriptionViewModel.createSubscription(selectedPlan!!)
-                            })
+                            }
+                        )
                     }
                 }
             }
         }
     )
+
     if (showDialog) {
         DialogApp(
             message = "¡Pago exitoso!",
