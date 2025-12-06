@@ -3,9 +3,8 @@ package com.techzo.cambiazo.data.repository
 import com.techzo.cambiazo.common.Resource
 import com.techzo.cambiazo.data.remote.donations.OngDto
 import com.techzo.cambiazo.data.remote.donations.DonationsService
-import com.techzo.cambiazo.data.remote.donations.Ong
-import com.techzo.cambiazo.data.remote.products.toProduct
-import com.techzo.cambiazo.domain.Product
+import com.techzo.cambiazo.data.remote.donations.toOng
+import com.techzo.cambiazo.domain.OngDetail
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,12 +17,12 @@ class DonationsRepository @Inject constructor(
     }
 
 
-    suspend fun getOngById(id: Int): Resource<Ong> = withContext(Dispatchers.IO) {
+    suspend fun getOngById(id: Int): Resource<OngDetail> = withContext(Dispatchers.IO) {
         try {
             val response = donationsService.getOngById(id)
             if (response.isSuccessful) {
-                response.body()?.let { Ong->
-                    return@withContext Resource.Success(data = Ong)
+                response.body()?.let { ong->
+                    return@withContext Resource.Success(data = ong.toOng())
                 }
                 return@withContext Resource.Error("No se encontró la ONG")
             }

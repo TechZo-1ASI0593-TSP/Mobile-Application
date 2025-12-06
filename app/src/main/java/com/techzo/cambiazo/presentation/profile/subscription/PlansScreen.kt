@@ -2,28 +2,53 @@ package com.techzo.cambiazo.presentation.profile.subscription
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Diamond
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.techzo.cambiazo.MainActivity
 import com.techzo.cambiazo.common.Constants
-import com.techzo.cambiazo.common.components.*
+import com.techzo.cambiazo.common.components.ButtonApp
+import com.techzo.cambiazo.common.components.ButtonIconHeaderApp
+import com.techzo.cambiazo.common.components.DialogApp
+import com.techzo.cambiazo.common.components.MainScaffoldApp
+import com.techzo.cambiazo.common.components.SubTitleText
+import com.techzo.cambiazo.common.components.TextTitleHeaderApp
 import com.techzo.cambiazo.domain.Plan
 
+/**
+ * Pantalla que muestra otros planes disponibles para cambiar tu suscripción.
+ */
 @Composable
 fun PlansScreen(
     viewModel: SubscriptionViewModel = hiltViewModel(),
@@ -34,7 +59,10 @@ fun PlansScreen(
 ) {
     val state = viewModel.state.value
     val subscription by viewModel.subscription
-    val availablePlans = state.data?.filter { it.id != subscription.plan.id } ?: emptyList()
+
+    // Mostramos solo los planes distintos al actual
+    val availablePlans: List<Plan> =
+        state.data?.filter { it.id != subscription.plan.id } ?: emptyList()
 
     var showCancelDialog by remember { mutableStateOf(false) }
 
@@ -42,23 +70,40 @@ fun PlansScreen(
         paddingCard = PaddingValues(top = 20.dp),
         contentsHeader = {
             Column(
-                Modifier
+                modifier = Modifier
                     .padding(bottom = 30.dp)
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ButtonIconHeaderApp(Icons.Filled.ArrowBack, onClick = { back() })
+                // IMPORTANTE: usar parámetro posicional o 'iconVector', NO 'icon'
+                ButtonIconHeaderApp(
+                    Icons.Filled.ArrowBack,
+                    onClick = { back() }
+                )
                 TextTitleHeaderApp("Suscripción")
             }
         },
         content = {
-            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)) {
+            Column(
+                modifier = Modifier.padding(
+                    horizontal = 20.dp,
+                    vertical = 5.dp
+                )
+            ) {
                 SubTitleText("Otros planes de suscripción")
                 Spacer(modifier = Modifier.height(10.dp))
-                availablePlans.reversed().forEach { plan ->
-                    SubscriptionPlanCard(plan, onPlanClick = { onPlanClick(it) }, showCancelDialog = { showCancelDialog = true }, activity = activity)
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
+
+                availablePlans
+                    .reversed()
+                    .forEach { plan ->
+                        SubscriptionPlanCard(
+                            plan = plan,
+                            onPlanClick = { onPlanClick(it) },
+                            showCancelDialog = { showCancelDialog = true },
+                            activity = activity
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
             }
         }
     )
@@ -80,6 +125,9 @@ fun PlansScreen(
     }
 }
 
+/**
+ * Tarjeta individual de plan disponible.
+ */
 @Composable
 fun SubscriptionPlanCard(
     plan: Plan,
@@ -89,6 +137,7 @@ fun SubscriptionPlanCard(
     activity: FragmentActivity? = null
 ) {
     val actualPlanName = viewModel.subscription.value.plan.name
+
     val backgroundColor = when (plan.id) {
         1 -> Color.Gray
         2 -> Color.Black
@@ -104,8 +153,15 @@ fun SubscriptionPlanCard(
         Column(
             modifier = Modifier
                 .background(Color.White)
-                .padding(end = 20.dp, start = 20.dp, top = 20.dp, bottom = 10.dp)
+                .padding(
+                    start = 20.dp,
+                    end = 20.dp,
+                    top = 20.dp,
+                    bottom = 10.dp
+                )
         ) {
+
+            // Encabezado con icono + nombre del plan
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 5.dp)
@@ -113,7 +169,10 @@ fun SubscriptionPlanCard(
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .background(backgroundColor, shape = RoundedCornerShape(5.dp)),
+                        .background(
+                            color = backgroundColor,
+                            shape = RoundedCornerShape(5.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -123,13 +182,16 @@ fun SubscriptionPlanCard(
                         tint = iconColor
                     )
                 }
+
                 Spacer(modifier = Modifier.width(10.dp))
+
                 Text(
                     text = plan.name,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 28.sp,
                     color = Color.Black
                 )
+
                 if (plan.id == 3) {
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
@@ -137,14 +199,20 @@ fun SubscriptionPlanCard(
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .background(Color(0xFFFFD146), shape = RoundedCornerShape(50.dp))
+                            .background(
+                                Color(0xFFFFD146),
+                                shape = RoundedCornerShape(50.dp)
+                            )
                             .padding(horizontal = 8.dp)
                             .height(18.dp)
-                            .offset(y = -3.dp),
+                            .offset(y = (-3).dp),
                     )
                 }
             }
+
             Spacer(modifier = Modifier.height(15.dp))
+
+            // Beneficios del plan
             plan.benefits.forEach { benefits ->
                 Text(
                     modifier = Modifier
@@ -155,12 +223,17 @@ fun SubscriptionPlanCard(
                     color = Color.Black
                 )
             }
+
+            // Aviso especial para bajar a Lite (plan id = 1)
             if (plan.id == 1) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .background(Color(0xFFE1E1E1), shape = RoundedCornerShape(5.dp))
+                        .background(
+                            Color(0xFFE1E1E1),
+                            shape = RoundedCornerShape(5.dp)
+                        )
                         .height(40.dp)
                         .fillMaxWidth()
                         .padding(horizontal = 6.dp),
@@ -180,10 +253,22 @@ fun SubscriptionPlanCard(
                 }
                 Spacer(modifier = Modifier.height(10.dp))
             }
+
             Spacer(modifier = Modifier.height(10.dp))
-            HorizontalDivider(color = Color(0xFFF2F2F2), thickness = 1.5.dp)
+
+            HorizontalDivider(
+                color = Color(0xFFF2F2F2),
+                thickness = 1.5.dp
+            )
+
             Spacer(modifier = Modifier.height(10.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 5.dp)) {
+
+            // Precio + botón de acción
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 5.dp)
+            ) {
+
                 Row(verticalAlignment = Alignment.Bottom) {
                     if (plan.price == 0.0) {
                         Text(
@@ -207,8 +292,11 @@ fun SubscriptionPlanCard(
                         )
                     }
                 }
+
                 Spacer(modifier = Modifier.weight(1f))
+
                 val buttonText = if (plan.id == 1) "Cancelar Plan" else "Seleccionar"
+
                 Box(modifier = Modifier.width(170.dp)) {
                     ButtonApp(
                         text = buttonText,
@@ -220,8 +308,13 @@ fun SubscriptionPlanCard(
                                 viewModel.startOrder(activity, plan.price, plan.id)
                             }
 
+                            // Lógica anterior (por si quieres volver):
+                            // if (plan.id == 1) {
+                            //     showCancelDialog()
+                            // } else {
+                            //     onPlanClick(plan.id.toString())
+                            // }
                         }
-//                        onClick = { if (plan.id == 1) showCancelDialog() else onPlanClick(plan.id.toString()) }
                     )
                 }
             }
