@@ -5,13 +5,6 @@ import com.techzo.cambiazo.domain.Plan
 import com.techzo.cambiazo.domain.Subscription
 import com.techzo.cambiazo.domain.SubscriptionResponse
 
-// ------------------------------------------------------
-// SUBSCRIPTIONS DTOs
-// ------------------------------------------------------
-
-/**
- * Representa una suscripción obtenida desde la API (capa remota).
- */
 data class SubscriptionDto(
     val id: Int,
     val startDate: String,
@@ -21,11 +14,8 @@ data class SubscriptionDto(
     val plan: Plan
 )
 
-/**
- * Conversión de SubscriptionDto (remoto) a Subscription (dominio).
- */
-fun SubscriptionDto.toSubscription(): Subscription =
-    Subscription(
+fun SubscriptionDto.toSubscription(): Subscription {
+    return Subscription(
         id = id,
         startDate = startDate,
         endDate = endDate,
@@ -33,34 +23,25 @@ fun SubscriptionDto.toSubscription(): Subscription =
         userId = userId,
         plan = plan
     )
+}
 
-/**
- * DTO utilizado para enviar datos de creación/actualización de una suscripción.
- */
-data class SubscriptionRequestDto(
+data class  SubscriptionRequestDto(
     val state: String,
     val userId: Int,
     val planId: Int
 )
 
-/**
- * DTO de respuesta que retorna la API al operar sobre suscripciones
- * (por ejemplo, al crear o actualizar).
- */
 data class SubscriptionResponseDto(
     val id: Int,
     val state: String,
     val planId: Int,
     val userId: Int,
     val startDate: String,
-    val endDate: String
+    val endDate: String,
 )
 
-/**
- * Conversión de SubscriptionResponseDto (remoto) a SubscriptionResponse (dominio).
- */
-fun SubscriptionResponseDto.toSubscription(): SubscriptionResponse =
-    SubscriptionResponse(
+fun SubscriptionResponseDto.toSubscription(): SubscriptionResponse {
+    return SubscriptionResponse(
         id = id,
         state = state,
         planId = planId,
@@ -68,14 +49,8 @@ fun SubscriptionResponseDto.toSubscription(): SubscriptionResponse =
         startDate = startDate,
         endDate = endDate
     )
+}
 
-// ------------------------------------------------------
-// PLANS DTOs
-// ------------------------------------------------------
-
-/**
- * DTO de planes que viene desde el backend (capa remota).
- */
 data class PlansDto(
     val id: Int,
     val name: String,
@@ -84,25 +59,16 @@ data class PlansDto(
     val benefits: List<Benefit>
 )
 
-/**
- * Conversión de PlansDto (remoto) a Plan (dominio).
- */
-fun PlansDto.toPlan(): Plan =
-    Plan(
+fun PlansDto.toPlan(): Plan {
+    return Plan(
         id = id,
         name = name,
         description = description,
         price = price,
         benefits = benefits
     )
+}
 
-// ------------------------------------------------------
-// BENEFITS DTOs
-// ------------------------------------------------------
-
-/**
- * DTO de beneficios asociados a un plan específico.
- */
 data class BenefitsDto(
     val id: Int,
     val description: String,
